@@ -1,21 +1,27 @@
 CXX      := g++
-CXXFLAGS := -std=c++17 -Wall -Wextra -g -Iinclude
+CXXFLAGS := -std=c++17 -Wall -Wextra -g -fsanitize=address -Iinclude -Iutil
 
-SRCS    := $(wildcard src/*.cc) $(wildcard test/*.cc) $(wildcard test/*.cpp)
-HEADERS := $(wildcard include/*.h) $(wildcard src/*.h)
+LIB_SRCS := $(wildcard src/*.cc) $(wildcard util/*.cc)
+HEADERS  := $(wildcard include/*.h) $(wildcard src/*.h) $(wildcard util/*.h)
 
-OUT_DIR := out
-BIN     := $(OUT_DIR)/db_test
+OUT_DIR   := out
+DB_BIN    := $(OUT_DIR)/db_test
+ARENA_BIN := $(OUT_DIR)/arena_test
 
+all: $(DB_BIN) $(ARENA_BIN)
 
-$(BIN): $(SRCS) $(HEADERS)
+$(DB_BIN): test/test.cpp $(LIB_SRCS) $(HEADERS)
 	mkdir -p $(OUT_DIR)
-	$(CXX) $(CXXFLAGS) $(SRCS) -o $(BIN)
+	$(CXX) $(CXXFLAGS) test/test.cpp $(LIB_SRCS) -o $(DB_BIN)
 
-run: $(BIN)
-	./$(BIN)
+$(ARENA_BIN): test/arena_test.cc $(LIB_SRCS) $(HEADERS)
+	mkdir -p $(OUT_DIR)
+	$(CXX) $(CXXFLAGS) test/arena_test.cc $(LIB_SRCS) -o $(ARENA_BIN)
+
+run: all
+	./$(DB_BIN) && ./$(ARENA_BIN)
 
 clean:
-	rm -f ./$(BIN)
+	rm -rf $(OUT_DIR)
 
-.PHONY: run clean
+.PHONY: all run clean
