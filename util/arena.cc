@@ -1,7 +1,11 @@
 #include <algorithm>
 #include "arena.h"
 
+namespace leveldb_clone {
+
+namespace {
 const size_t kDefaultSize = 4096;
+}  // namespace
 
 Arena::~Arena() {
     for (auto ptr : blocks_)
@@ -26,3 +30,5 @@ char* Arena::Allocate(size_t bytes) {
 
     return ptr;
 }
+
+}  // namespace leveldb_clone

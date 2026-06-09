@@ -4,6 +4,8 @@
 #include "../include/slice.h"
 #include "../include/status.h"
 
+using namespace leveldb_clone;
+
 int main () {
    Arena a; 
    a.Allocate(5);

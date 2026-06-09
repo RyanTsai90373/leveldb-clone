@@ -6,6 +6,8 @@
 #ifndef LEVELDB_CLONE_INCLUDE_STATUS_H
 #define LEVELDB_CLONE_INCLUDE_STATUS_H
 
+namespace leveldb_clone {
+
 class Status {
 public:
     // Encapsulate construction so that users can only construct a Status with valid Code
@@ -40,5 +42,7 @@ private:
     // so that the compiler knows msg will not be modified.
     Status(Code code, const Slice& msg) : code_(code), msg_(msg.ToString()) {}
 };
+
+}  // namespace leveldb_clone
 
 #endif

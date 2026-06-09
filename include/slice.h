@@ -10,10 +10,12 @@
 #ifndef LEVELDB_CLONE_INCLUDE_SLICE_H
 #define LEVELDB_CLONE_INCLUDE_SLICE_H
 
+namespace leveldb_clone {
+
 class Slice {
 public:
     // ===== Constructor =====
-    // The default constrcutor put "" instead of nullptr, which ensures that
+    // The default constrcutor put "" instead of nullptr, which ensures
     // the data will never be a nullptr, and we will not have to check 
     // if (data_ == nullptr) before using it
     Slice() : data_(""), size_(0) {}
@@ -39,6 +41,7 @@ public:
 
     // ===== Comparison =====
     int compare(const Slice& rhs) const { 
+        // Comparison is just like deducting each byte
         const size_t n = std::min(size_, rhs.size_);
         int r = std::memcmp(data_, rhs.data_, n);
         if (r == 0) {
@@ -67,5 +70,7 @@ private:
     const char* data_;
     size_t size_;
 };
+
+}  // namespace leveldb_clone
 
 #endif

@@ -7,6 +7,8 @@
 #ifndef LEVELDB_CLONE_DB_H
 #define LEVELDB_CLONE_DB_H
 
+namespace leveldb_clone {
+
 class DB {
 public:
     DB() = default;
@@ -20,5 +22,7 @@ public:
     virtual Status Delete(const Slice& key) = 0;
     virtual Status Get(const Slice& key, std::string* value) = 0;
 };
+
+}  // namespace leveldb_clone
 
 #endif

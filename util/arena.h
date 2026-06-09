@@ -6,6 +6,8 @@
 #ifndef LEVELDB_CLONE_UTIL_ARENA_H
 #define LEVELDB_CLONE_UTIL_ARENA_H
 
+namespace leveldb_clone {
+
 class Arena {                                                   
 public:                                                                
     Arena() : alloc_ptr_(nullptr), alloc_bytes_remaining_(0), memory_usage_(0) {};                                                              
@@ -25,6 +27,8 @@ private:
     std::vector<char*> blocks_;                                                 
     std::atomic<size_t> memory_usage_;
 
-};      
+};
+
+}  // namespace leveldb_clone
 
 #endif

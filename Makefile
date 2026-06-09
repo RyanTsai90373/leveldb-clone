@@ -10,9 +10,9 @@ ARENA_BIN := $(OUT_DIR)/arena_test
 
 all: $(DB_BIN) $(ARENA_BIN)
 
-$(DB_BIN): test/test.cpp $(LIB_SRCS) $(HEADERS)
+$(DB_BIN): test/db_test.cpp $(LIB_SRCS) $(HEADERS)
 	mkdir -p $(OUT_DIR)
-	$(CXX) $(CXXFLAGS) test/test.cpp $(LIB_SRCS) -o $(DB_BIN)
+	$(CXX) $(CXXFLAGS) test/db_test.cpp $(LIB_SRCS) -o $(DB_BIN)
 
 $(ARENA_BIN): test/arena_test.cc $(LIB_SRCS) $(HEADERS)
 	mkdir -p $(OUT_DIR)

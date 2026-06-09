@@ -4,6 +4,8 @@
 #include "../include/slice.h"
 #include "../include/status.h"
 
+using namespace leveldb_clone;
+
 int main () {
     DB* mydb = nullptr; 
     Status st = DB::Open(Slice("mydb"), &mydb);
@@ -20,4 +22,6 @@ int main () {
 
     mydb->Delete("a");
     assert(mydb->Get("a", &s).IsNotFound());
+
+    delete mydb;
 }
