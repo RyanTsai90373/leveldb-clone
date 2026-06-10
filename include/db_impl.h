@@ -3,6 +3,8 @@
 #include "db.h"
 #include "status.h"
 #include "slice.h"
+#include "../db/dbformat.h"
+#include "../util/arena.h"
 
 #ifndef LEVELDB_CLONE_INCLUDE_DB_IMPL_H
 #define LEVELDB_CLONE_INCLUDE_DB_IMPL_H
@@ -17,8 +19,11 @@ public:
     Status Get(const Slice& key, std::string* value) override;
     Status Delete(const Slice& key) override;
 private:
+    // tmp
+    SequenceNumber seq_ = 0;;
+    Arena arena;
     std::string name_;
-    std::map<std::string, std::string> table_;
+    std::map<std::string, char*> table_;
 };
 
 }  // namespace leveldb_clone

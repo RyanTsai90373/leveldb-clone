@@ -3,12 +3,17 @@
 #include <cassert>
 #include "../include/slice.h"
 
+#ifndef LEVELDB_CLONE_DB_DBFORMAT_H
+#define LEVELDB_CLONE_DB_DBFORMAT_H
+
 namespace leveldb_clone {
 
 using SequenceNumber = uint64_t;
 
 
 enum ValueType { kTypeDeletion = 0x0, kTypeValue = 0x1 };
+
+// static char* EncodeVarint32
 
 class InternalKey {
 public:
@@ -40,3 +45,5 @@ private:
     std::string rep_;
 };
 } // namespace leveldb_clone
+
+#endif
