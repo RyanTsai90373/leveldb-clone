@@ -3,6 +3,7 @@
 #include "db.h"
 #include "status.h"
 #include "slice.h"
+#include "../db/memtable.h"
 #include "../db/dbformat.h"
 #include "../util/arena.h"
 
@@ -21,9 +22,8 @@ public:
 private:
     // tmp
     SequenceNumber seq_ = 0;;
-    Arena arena;
     std::string name_;
-    std::map<std::string, char*> table_;
+    MemTable table_; 
 };
 
 }  // namespace leveldb_clone
