@@ -7,61 +7,59 @@ namespace leveldb_clone {
 
 void MemTable::Add(SequenceNumber seq, ValueType type, const Slice& key, const Slice& value) {
     // [size of all][Key + Seq(8bytes)][Value]
-    // 1. Compute Internal Key
-    InternalKey inkey {key, seq, type};
-    std::string inkey_str = inkey.Encode().ToString();
+    InternalKey k {key, seq, type};
+    Slice inkey = k.Encode();
     
-    // 2. Concatenate with value
-    std::string kv = inkey_str + value.ToString();
     // TODO: variant version, first bit is to represent whether to continue reading 
     // Currently using fixed one byte header, suppose it will not take more than 7 bytes
     // to represent Internalkey + value
-    uint8_t header_size = kv.size();
-    int total_bytes = 1 + kv.size();
+    uint8_t kv_size = inkey.size() + value.size();
+    int total_bytes = 1 + kv_size;
     char* data = arena_.Allocate(total_bytes);
-    
-    // 3. Put a header of how many bytes needed
-    std::string s;
-    s = static_cast<char>(header_size) + kv;
-    memcpy(data, s.data(), s.size());
 
-    table_[inkey_str] = data;
-    // Seq++ should be performed by DB
-    // seq_++;
+    // Move data to arena
+    char* p = data;
+    memcpy(p, &kv_size, sizeof(kv_size));
+    p += sizeof(kv_size);
+    memcpy(p, inkey.data(), inkey.size());
+    p += inkey.size();
+    memcpy(p, value.data(), value.size());
+
+    table_[inkey.ToString()] = data;
 }
 
 // TODO: Change it to LookupKey
 Status MemTable::Get(const Slice& key, std::string* value, SequenceNumber seq) {
-    bool deleted = false;
-    // very inefficient, needs to adjust 
-    for (int i = seq; i >= 0; --i) {
-        // Exact match
-        InternalKey ikey {key, i, kTypeValue};
-        std::string key_str = ikey.Encode().ToString();
-        auto it = table_.find(key_str);
-        // No exact match, maybe a deletion
-        if (it == table_.end()) {
-            ikey = {key, i, kTypeDeletion};
-            key_str = ikey.Encode().ToString();
-            it = table_.find(key_str);
-            if (it != table_.end())
-                deleted = true;
-        }
+    // Exact match
+    InternalKey inkey {key, seq, kTypeValue};
+    std::string key_str = inkey.Encode().ToString();
+    // lower_bound: return the first element that (*it, k) is false
+    // We pass in a descending comparator, which means lower_bound
+    // will find the value that is <= key_str
+    auto it = table_.lower_bound(key_str);
 
-        // Find a match, can be a value, or a deletion 
-        if (it != table_.end()) {
-            if (deleted) return Status::NotFound("Deleted");
 
-            const char* p = it->second;
-            uint8_t msg_size = static_cast<uint8_t>(*p);
-            // 2. 1bytes header + 8bytes internalkey
-            p += 1 + key_str.size();
-            // 3. after that is the message
-            *value = {p, msg_size - key_str.size()};
-            return Status::Ok();
-        }
+    // Find a match, can either be a value or a deletion 
+    if (it != table_.end()) {
+        // Check if the key is the same
+        Slice stored_user_key (it->first.data(), it->first.size() - 8);
+        if (key != stored_user_key)
+            return Status::NotFound("Wrong Key"); 
+
+        // The eighth bit of first byte decides whether it is a put or deleteion
+        if (static_cast<uint8_t>(it->first[key.size()]) == 0)
+            return Status::NotFound("Key Deleted");
+
+        // Data in the Arena
+        const char* p = it->second;
+        uint8_t msg_size = static_cast<uint8_t>(*p);
+        // 2. 1bytes header + 8bytes internalkey
+        p += 1 + key_str.size();
+        // 3. after that is the message
+        *value = {p, msg_size - key_str.size()};
+        return Status::Ok();
     }
-    return Status::NotFound("wrong key");
+    return Status::NotFound("Wrong key");
 }
 
 }

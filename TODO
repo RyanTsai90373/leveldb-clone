@@ -1,4 +1,3 @@
-- inefficient query 
 - 1bytes header
 - LookupKey
 - skiplist
