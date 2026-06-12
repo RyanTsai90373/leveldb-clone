@@ -29,7 +29,7 @@ bool GetVarint32(Slice* input, uint32_t* value) {
         // ran out of input before the varint ended. 
         if (input->size() == 0)
             return false;
-        uint8_t byte = static_cast<uint8_t>(*input->data());
+        uint32_t byte = static_cast<uint8_t>(*input->data());
 
         *value |= (byte & 0x7F) << (7 * i);
         input->remove_prefix(1);
@@ -39,6 +39,34 @@ bool GetVarint32(Slice* input, uint32_t* value) {
     }
     return false;
 }                                          
+
+char* EncodeVarint64(char* dst, uint64_t v) {
+    while (v >= 0x80) {
+        *dst = (v & 0x7F) | 0x80;
+        dst++;
+        v >>= 7;
+    }
+    *dst = v;
+    dst++; // return the last poistion
+    return dst;
+}
+
+bool GetVarint64(Slice* input, uint64_t* value) {
+    *value = 0;
+    // 64 / 7 = 9...1
+    for (int i = 0; i < 10; i++) {
+        if (input->size() == 0)
+            return false;
+        uint64_t byte = static_cast<uint8_t>(*input->data());
+        *value |= (byte & 0x7F) << (7 * i);
+        input->remove_prefix(1);
+
+        if ((byte & 0x80) == 0)
+            return true;
+    }
+    return false;
+}
+
 
 } // namespace leveldb_clone
 

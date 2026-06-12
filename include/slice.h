@@ -66,7 +66,7 @@ public:
     // 2. The string itself contains \0, thus we might stop before going through the whole string
     std::string ToString() const { return std::string(data_, size_); }
 
-    bool remove_prefix(size_t n) { data_ += n; size_ -= n; }
+    void remove_prefix(size_t n) { data_ += n; size_ -= n; }
 
 private:
     const char* data_;
