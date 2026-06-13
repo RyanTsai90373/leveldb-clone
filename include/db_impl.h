@@ -21,7 +21,7 @@ public:
     Status Delete(const Slice& key) override;
 private:
     // tmp
-    SequenceNumber seq_ = 0;;
+    SequenceNumber seq_ = 0;
     std::string name_;
     MemTable table_; 
 };

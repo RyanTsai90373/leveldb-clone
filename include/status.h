@@ -1,6 +1,4 @@
 // status.h is an wrapper of an enum, provides status code and msg
-
-
 #include "slice.h"
 
 #ifndef LEVELDB_CLONE_INCLUDE_STATUS_H

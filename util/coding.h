@@ -1,6 +1,9 @@
 #include <cstdint>
 #include "../include/slice.h"
 
+#ifndef LEVELDB_CLONE_UTIL_CODING_H
+#define LEVELDB_CLONE_UTIL_CODING_H
+
 namespace leveldb_clone
 {
 
@@ -45,3 +48,4 @@ inline uint64_t DecodeFixed64(const char* ptr) {
 }
 
 } // namespace leveldb_clone
+#endif
