@@ -1,5 +1,5 @@
 #include <cstdint>
-#include "../include/slice.h"
+#include "slice.h"
 
 #ifndef LEVELDB_CLONE_UTIL_CODING_H
 #define LEVELDB_CLONE_UTIL_CODING_H

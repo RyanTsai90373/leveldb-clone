@@ -1,7 +1,6 @@
 #include <cassert>
-#include "string"
-#include "../include/slice.h"
-#include "../util/coding.h"
+#include "slice.h"
+#include "util/coding.h"
 
 using namespace leveldb_clone;
 

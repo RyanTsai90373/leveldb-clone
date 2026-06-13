@@ -3,7 +3,7 @@
 #include "db.h"
 #include "slice.h"
 #include "status.h"
-#include "db/dbformat.h"
+#include "../db/dbformat.h"
 
 using namespace leveldb_clone;
 

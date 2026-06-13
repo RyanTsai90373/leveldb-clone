@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <string>
 
-#include "../include/status.h"
+#include "status.h"
 
 namespace leveldb_clone {
 

@@ -1,5 +1,5 @@
 #include <cstdint>
-#include "../include/slice.h"
+#include "slice.h"
 
 
 namespace leveldb_clone

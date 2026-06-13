@@ -1,4 +1,4 @@
-#include "../include/status.h"
+#include "status.h"
 
 #ifndef LEVELDB_CLONE_UTIL_WRITABLEFILE_H
 #define LEVELDB_CLONE_UTIL_WRITABLEFILE_H
