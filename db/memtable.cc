@@ -1,7 +1,7 @@
 #include "memtable.h"
 #include "dbformat.h"
-#include "../include/slice.h"
-#include "../include/status.h"
+#include "slice.h"
+#include "status.h"
 
 namespace leveldb_clone {
 

@@ -1,4 +1,4 @@
-#include "../include/comparator.h"
+#include "comparator.h"
 #include <string>
 
 namespace leveldb_clone {

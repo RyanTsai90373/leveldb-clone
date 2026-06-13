@@ -1,7 +1,7 @@
 #include <string>
 #include <stdint.h>
 #include <cassert>
-#include "../include/slice.h"
+#include "slice.h"
 
 #ifndef LEVELDB_CLONE_DB_DBFORMAT_H
 #define LEVELDB_CLONE_DB_DBFORMAT_H

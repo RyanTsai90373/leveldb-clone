@@ -1,8 +1,8 @@
 #include <map>
-#include "../include/slice.h"
-#include "../include/status.h"
+#include "slice.h"
+#include "status.h"
 #include "../util/arena.h"
-#include "../db/dbformat.h"
+#include "dbformat.h"
 
 namespace leveldb_clone
 {

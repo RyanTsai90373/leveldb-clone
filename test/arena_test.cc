@@ -1,5 +1,5 @@
-#include "../include/slice.h"
-#include "../include/status.h"
+#include "slice.h"
+#include "status.h"
 #include "../util/arena.h"
 #include <cassert>
 

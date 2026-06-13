@@ -1,9 +1,9 @@
 #include <cassert>
 #include <string>
-#include "../include/db.h"
-#include "../include/slice.h"
-#include "../include/status.h"
-#include "../db/dbformat.h"
+#include "db.h"
+#include "slice.h"
+#include "status.h"
+#include "db/dbformat.h"
 
 using namespace leveldb_clone;
 
