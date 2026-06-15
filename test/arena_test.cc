@@ -1,6 +1,6 @@
 #include "slice.h"
 #include "status.h"
-#include "util/arena.h"
+#include "../util/arena.h"
 #include <cassert>
 
 using namespace leveldb_clone;

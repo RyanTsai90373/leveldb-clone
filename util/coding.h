@@ -12,6 +12,15 @@ bool GetVarint32(Slice* input, uint32_t* value);
 char* EncodeVarint64(char* dst, uint64_t v);
 bool GetVarint64(Slice* input, uint64_t* value);
 
+
+inline void EncodeFixed16(char* dst, uint32_t value) {
+    for (int i = 0; i < 2; i++) {
+        uint8_t byte = static_cast<uint8_t>(value);
+        *dst = byte; 
+        dst++;
+        value >>= 8;
+    }
+}
 inline void EncodeFixed32(char* dst, uint32_t value) {
     for (int i = 0; i < 4; i++) {
         uint8_t byte = static_cast<uint8_t>(value);

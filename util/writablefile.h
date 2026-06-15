@@ -22,6 +22,7 @@ public:
     virtual Status Sync() = 0;
 };
 
+const WritableFile* GetPosixWritableFile(const Slice& s, int fd);
 } // namespace leveldb_clone
 
 #endif

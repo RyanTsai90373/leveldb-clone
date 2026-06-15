@@ -14,7 +14,7 @@ const uint64_t kWritableFileBufferSize = 65536;
 // write in batch to reduce call of write() & fsync()
 class PosixWritableFile : public WritableFile {
    public:
-    PosixWritableFile(std::string filename, int fd) : filename_(filename), fd_(fd), pos_(0) {}
+    PosixWritableFile(const std::string& filename, int fd) : fd_(fd), filename_(filename), pos_(0) {}
 
     ~PosixWritableFile() { Close(); }
 
@@ -76,5 +76,10 @@ class PosixWritableFile : public WritableFile {
     // std::string dirname_;
     size_t pos_;
 };
+
+const WritableFile* GetPosixWritableFile(const Slice& filename, int fd) {
+	static WritableFile* f = new PosixWritableFile{std::string{filename.data(), filename.size()}, fd}; 
+	return f;
+}
 
 }  // namespace leveldb_clone
