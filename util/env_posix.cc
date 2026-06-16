@@ -1,11 +1,9 @@
-#include "writablefile.h"
-
 #include <unistd.h>
-
+#include <fcntl.h>
 #include <cstdint>
 #include <string>
-
 #include "status.h"
+#include "env.h"
 
 namespace leveldb_clone {
 
@@ -14,7 +12,7 @@ const uint64_t kWritableFileBufferSize = 65536;
 // write in batch to reduce call of write() & fsync()
 class PosixWritableFile : public WritableFile {
    public:
-    PosixWritableFile(const std::string& filename, int fd) : fd_(fd), filename_(filename), pos_(0) {}
+    PosixWritableFile(int fd, const std::string& filename) : fd_(fd), filename_(filename), pos_(0) {}
 
     ~PosixWritableFile() { Close(); }
 
@@ -77,9 +75,48 @@ class PosixWritableFile : public WritableFile {
     size_t pos_;
 };
 
-const WritableFile* GetPosixWritableFile(const Slice& filename, int fd) {
-	static WritableFile* f = new PosixWritableFile{std::string{filename.data(), filename.size()}, fd}; 
-	return f;
+
+class PosixSequentialFile : public SequentialFile {
+public:
+	PosixSequentialFile(int fd, const Slice& fname) : fd_(fd), fname_(fname.data(), fname.size()) {}
+    ~PosixSequentialFile() { ::close(fd_);}
+
+    Status Skip(int64_t n) override { 
+        if(lseek(fd_, n, SEEK_CUR) < 0)
+            return Status::IOError("Skip Fail");
+        return Status::Ok();
+    }
+    // TODO: LevelDB implement in a while loop
+    Status Read(char* buf, size_t n, size_t* actual_read) override {
+        // ::read manage the current potision
+        ssize_t result = ::read(fd_, buf, n);
+        // only set actual_read when success
+        if (result < 0)
+            return Status::IOError("IOError");
+        *actual_read = result;
+        return Status::Ok();
+    }
+private:
+	int fd_;
+	std::string fname_;
+};
+
+Status GetWritableFile(const Slice& s, WritableFile** wrfile) {
+    int fd = ::open(s.ToString().c_str(), O_TRUNC | O_WRONLY | O_CREAT, 0644);
+    if (fd < 0)
+        return Status::IOError("Fail to open file");
+    *wrfile = new PosixWritableFile(fd, std::string{s.data(), s.size()});
+    return Status::Ok();
 }
+
+Status GetSequentialFile(const Slice& s, SequentialFile** sqfile) {
+    int fd = ::open(s.ToString().c_str(), O_RDONLY);
+    if (fd < 0)
+        return Status::IOError("Fail to open file");
+    *sqfile = new PosixSequentialFile(fd, std::string{s.data(), s.size()});
+    return Status::Ok();
+}
+
+
 
 }  // namespace leveldb_clone
