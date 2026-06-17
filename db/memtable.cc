@@ -2,28 +2,28 @@
 #include "dbformat.h"
 #include "slice.h"
 #include "status.h"
+#include "../util/coding.h"
 
 namespace leveldb_clone {
 
 void MemTable::Add(SequenceNumber seq, ValueType type, const Slice& key, const Slice& value) {
-    // [size of all][Key + Seq(8bytes)][Value]
-    InternalKey k {key, seq, type};
+    // Format of an entry is concatenation of:
+    //  key_size     : varint32 of internal_key.size()
+    //  key bytes    : char[internal_key.size()]
+    //  tag          : uint64((sequence << 8) | type)
+    //  value_size   : varint32 of value.size()
+    //  value bytes  : char[value.size()]
+    InternalKey k{key, seq, type};
     Slice inkey = k.Encode();
-    
-    // TODO: variant version, first bit is to represent whether to continue reading 
-    // Currently using fixed one byte header, suppose it will not take more than 7 bytes
-    // to represent Internalkey + value
-    uint8_t kv_size = inkey.size() + value.size();
-    int total_bytes = 1 + kv_size;
-    char* data = arena_.Allocate(total_bytes);
 
-    // Move data to arena
+    size_t max_encoded = 5 + inkey.size() + 5 + value.size();
+    char* data = arena_.Allocate(max_encoded);
+
     char* p = data;
-    memcpy(p, &kv_size, sizeof(kv_size));
-    p += sizeof(kv_size);
-    memcpy(p, inkey.data(), inkey.size());
-    p += inkey.size();
-    memcpy(p, value.data(), value.size());
+    p = EncodeVarint32(p, inkey.size());                      // move 1~5 bytes forward
+    memcpy(p, inkey.data(), inkey.size()); p += inkey.size(); // actual data size (ex. 1000 bytes)
+    p = EncodeVarint32(p, value.size()); 
+    memcpy(p, value.data(), value.size()); p += value.size();
 
     table_[inkey.ToString()] = data;
 }
@@ -32,11 +32,11 @@ void MemTable::Add(SequenceNumber seq, ValueType type, const Slice& key, const S
 Status MemTable::Get(const Slice& key, std::string* value, SequenceNumber seq) {
     // Exact match
     InternalKey inkey {key, seq, kTypeValue};
-    std::string key_str = inkey.Encode().ToString();
+    std::string inkey_str = inkey.Encode().ToString();
     // lower_bound: return the first element that (*it, k) is false
     // We pass in a descending comparator, which means lower_bound
-    // will find the value that is <= key_str
-    auto it = table_.lower_bound(key_str);
+    // will find the value that is <= inkey_str
+    auto it = table_.lower_bound(inkey_str);
 
 
     // Find a match, can either be a value or a deletion 
@@ -50,14 +50,14 @@ Status MemTable::Get(const Slice& key, std::string* value, SequenceNumber seq) {
         if (static_cast<uint8_t>(it->first[key.size()]) == 0)
             return Status::NotFound("Key Deleted");
 
-        // Data in the Arena
-        const char* p = it->second;
-        uint8_t msg_size = static_cast<uint8_t>(*p);
-        // 2. 1bytes header + 8bytes internalkey
-        p += 1 + key_str.size();
-        // 3. after that is the message
-        *value = {p, msg_size - key_str.size()};
-        return Status::Ok();
+        Slice cursor(it->second, SIZE_MAX);   
+                                                                                                                    
+        uint32_t key_size, value_size;                                   
+        GetVarint32(&cursor, &key_size);                                                                            
+        cursor.remove_prefix(key_size);            // skip past the internal key
+        GetVarint32(&cursor, &value_size);                                                                          
+        *value = std::string(cursor.data(), value_size);                                                          
+        return Status::Ok(); 
     }
     return Status::NotFound("Wrong key");
 }
