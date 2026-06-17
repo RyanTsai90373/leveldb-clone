@@ -17,16 +17,9 @@ constexpr size_t kMaxBufferSize = 32768;
 
 class LogWriter {
 public:
-	uint32_t Crc32(uint8_t t, const char* payload, size_t length) {
-		char type_byte = static_cast<char>(t);
-		uint32_t crc = crc32c::Extend(0, &type_byte, 1);
-		crc = crc32c::Extend(crc, payload, length);
-		return crc32c::Mask(crc);
-	}
-
 	const std::string MakeHeader(log::RecordType t, const char* payload, size_t psize) {
 		uint8_t type = static_cast<uint8_t>(t);
-		uint32_t crc32 = Crc32(type, payload, psize);
+		uint32_t crc32 = crc32c::Crc32(type, payload, psize);
 		char header[7];
 		header[0] = static_cast<char>(crc32);
 		header[1] = static_cast<char>(crc32 >> 8);
@@ -51,7 +44,7 @@ public:
 		// Note: payload may seperated in several blcoks
 		size_t space = kMaxBufferSize - block_offset_; // space left for header + payload
 		const char* payload = s.data();
-		uint16_t psize = s.size();
+		size_t psize = s.size();
 		if (space >= psize + 7) {
 			std::string s = MakeHeader(log::kFullType, payload, psize);
 			Slice header{s};

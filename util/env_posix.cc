@@ -71,7 +71,6 @@ class PosixWritableFile : public WritableFile {
     int fd_;
     char buf_[kWritableFileBufferSize];
     std::string filename_;
-    // std::string dirname_;
     size_t pos_;
 };
 

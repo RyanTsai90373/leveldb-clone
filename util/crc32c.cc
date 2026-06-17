@@ -72,5 +72,12 @@ uint32_t Extend(uint32_t crc, const char* data, size_t n) {
   return l ^ kCRC32Xor;
 }
 
+uint32_t Crc32(uint8_t t, const char* payload, size_t length) {
+  char type_byte = static_cast<char>(t);
+  uint32_t crc = Extend(0, &type_byte, 1);
+  crc = Extend(crc, payload, length);
+  return Mask(crc);
+}
+
 }  // namespace crc32c
 }  // namespace leveldb_clone

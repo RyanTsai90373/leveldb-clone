@@ -31,6 +31,8 @@ inline uint32_t Unmask(uint32_t masked_crc) {
   return ((rot >> 17) | (rot << 15));
 }
 
+uint32_t Crc32(uint8_t t, const char* payload, size_t length);
+
 }  // namespace crc32c
 }  // namespace leveldb_clone
 

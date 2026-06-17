@@ -24,10 +24,11 @@ private:
 // File abstraction, interface to interact with a file
 class WritableFile {
 public:
-    // Q: why we need this anyway? is this because we delete a constructor?
+    // NOTE: Declaring a copy constructor, even a deleted one, suppresses the implicit
+    // default constructor, so explicitly default it.
     WritableFile() = default;
-    // no copy
-    // Q: difference between WritableFile and WritableFile& when deleting a constructor
+    // NOTE: Copy constructor takes const reference; passing by value would require
+    // a copy before the copy constructor can even run.
     WritableFile(const WritableFile&) = delete;
     WritableFile& operator=(const WritableFile&) = delete;
 
