@@ -20,7 +20,7 @@ void MemTable::Add(SequenceNumber seq, ValueType type, const Slice& key, const S
     char* data = arena_.Allocate(max_encoded);
 
     char* p = data;
-    p = EncodeVarint32(p, inkey.size());                      // move 1~5 bytes forward
+    p = EncodeVarint32(p, inkey.size());                            // move 1~5 bytes forward
     memcpy(p, inkey.data(), inkey.size()); p += inkey.size(); // actual data size (ex. 1000 bytes)
     p = EncodeVarint32(p, value.size()); 
     memcpy(p, value.data(), value.size()); p += value.size();

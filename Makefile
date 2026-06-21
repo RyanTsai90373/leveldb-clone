@@ -9,8 +9,9 @@ DB_BIN    := $(OUT_DIR)/db_test
 ARENA_BIN := $(OUT_DIR)/arena_test
 INTERNALKEY_BIN := $(OUT_DIR)/internalkey_test
 ENCODE_BIN := $(OUT_DIR)/encode_test
+WAL_BIN := $(OUT_DIR)/wal_test
 
-all: $(DB_BIN) $(ARENA_BIN) $(INTERNALKEY_BIN) $(ENCODE_BIN)
+all: $(DB_BIN) $(ARENA_BIN) $(INTERNALKEY_BIN) $(ENCODE_BIN) $(WAL_BIN)
 
 $(DB_BIN): test/db_test.cc $(LIB_SRCS) $(HEADERS)
 	mkdir -p $(OUT_DIR)
@@ -28,8 +29,12 @@ $(ENCODE_BIN): test/encode_test.cc $(LIB_SRCS) $(HEADERS)
 	mkdir -p $(OUT_DIR)
 	$(CXX) $(CXXFLAGS) test/encode_test.cc $(LIB_SRCS) -o $(ENCODE_BIN)
 
+$(WAL_BIN): test/wal_test.cc $(LIB_SRCS) $(HEADERS)
+	mkdir -p $(OUT_DIR)
+	$(CXX) $(CXXFLAGS) test/wal_test.cc $(LIB_SRCS) -o $(WAL_BIN)
+
 run: all
-	./$(DB_BIN) && ./$(ARENA_BIN) && ./$(INTERNALKEY_BIN) && ./$(ENCODE_BIN)
+	./$(DB_BIN) && ./$(ARENA_BIN) && ./$(INTERNALKEY_BIN) && ./$(ENCODE_BIN) && ./$(WAL_BIN)
 
 clean:
 	rm -rf $(OUT_DIR)

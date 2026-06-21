@@ -24,12 +24,12 @@ RecordType Reader::ReadPhysicalRecord(std::string** scatch) {
         offset_ = 0;
     }
     uint8_t type = static_cast<uint8_t>(buf_[offset_ + 6]);
-    uint16_t len = static_cast<uint16_t>(buf_[offset_ + 5]) | (static_cast<uint16_t>(buf_[offset_ + 4]) << 8);
+    uint16_t len = static_cast<uint16_t>(buf_[offset_ + 4]) | (static_cast<uint16_t>(buf_[offset_ + 5]) << 8);
     char* payload = &buf_[offset_ + 7];
     uint32_t checksum = crc32c::Crc32(type, payload, len);
 
-    char* crc32;
-    memcpy(&crc32, &buf_[offset_], 4);
+    char crc32[4];
+    memcpy(crc32, &buf_[offset_], 4);
     if (checksum != DecodeFixed32(crc32))
         return RecordType::kZeroType;
 
@@ -44,10 +44,12 @@ bool Reader::ReadRecord(Slice* record, std::string* scatch) {
     // Get a record until its type is Full or Last
     while (true) {
         RecordType type = ReadPhysicalRecord(&scatch);
+        bool flag = false;
         switch (type)
         {
         case RecordType::kFullType:
         case RecordType::kLastType:
+            flag = true;
             break;
         case RecordType::kFirstType:
         case RecordType::kMiddleType:
@@ -56,6 +58,8 @@ bool Reader::ReadRecord(Slice* record, std::string* scatch) {
         default:
             return false;
         }
+        if (flag)
+            break;
     }
     *record = Slice{*scatch};
     return true;

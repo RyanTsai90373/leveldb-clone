@@ -25,7 +25,10 @@ namespace log {
 // One Key Value pair a time
 class Reader {
 public:
-	Reader(SequentialFile* seqfile) : seqfile_(seqfile), block_(0), offset_(0) {}
+	Reader(SequentialFile* seqfile) : seqfile_(seqfile), block_(0), offset_(0) {
+		size_t bytes_read;
+		seqfile->Read(buf_, kBlockSize, &bytes_read);
+	}
 	// Composition over inheritance
 	class Report {};
 	// virtual Status OnError();
